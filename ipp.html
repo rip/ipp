@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<title>💓 ipp</title>
+<style>
+body, button, input, select {
+	background-color: black;
+	color: hotpink;
+	border: 1px solid hotpink;
+	border-radius: 1px;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<script>
+fetch('/cgi-bin/luci/admin/network/dhcplease_status')
+.then(response => response.json())
+.then(data => {
+        for (var y of data[0]) {
+                if (y.hostname == false) {y.hostname = '';}
+                document.getElementById('s').innerHTML += '<option value=' + y.ipaddr + '>' + y.ipaddr + ' (' + y.hostname  + ')</option>';
+        }
+})
+.catch(error => console.error(error))
+
+function s(val) {window.value = val;}
+
+function ip() {
+	document.getElementById('i').innerHTML = "";
+	fetch('/cgi-bin/luci/admin/status/realtime/connections_status')
+	.then(response => response.json())
+	.then(data => {
+		for (var i in data.connections) {
+			if (data.connections[i].src == window.value && (data.connections[i].sport == '3076' || data.connections[i].sport == '3074')) {
+				document.getElementById("i").innerHTML += data.connections[i].dst + '<br>';
+			}
+		}
+	})
+	.catch(error => console.error(error))
+}
+</script>
+<select id="s" onchange="s(this.value)"></select>
+<input type="text" value="3074, 3076" size="15">
+<!-- <a onclick="alert('port(s) filter. separated by a comma. example: 3074, 3076')">?</a> -->
+<button onclick="ip()">💓</button>
+<p id="i"></p>
+</body>
+</html>
+<!--
+
+LuCI module prototype.
+
+Just writing a few lines of HTML, CSS, and JavaScript as a quick little educational exercise.
+
+PoC, nothing special, and does not feature GeoIP lookup.
+
+Works well on phones and gaming console browsers.
+
+https://i.imgur.com/ibZM1ed.png
+
+-->
